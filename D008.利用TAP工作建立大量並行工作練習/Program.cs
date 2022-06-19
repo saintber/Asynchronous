@@ -22,9 +22,10 @@ namespace D008.利用TAP工作建立大量並行工作練習
                 tskCallApis.Add(CallApi2Async(URL, i));
             }
 
-            //var tskWrite = Task.Run(() => WriteDebugInfo());
+            var tskWrite = Task.Run(() => WriteDebugInfo());
             await Task.WhenAll(tskCallApis);
-            //IsCompleted = true;
+            IsCompleted = true;
+            await tskWrite;
             Console.WriteLine("按下任一按鍵，結束處理程序");
             Console.ReadKey();
         }
@@ -37,11 +38,10 @@ namespace D008.利用TAP工作建立大量並行工作練習
             // 取得當下的 ThreadId
             var tid = String.Format("{0:D2}", Thread.CurrentThread.ManagedThreadId);
 
-            ShowDebugInfoOld(index, 1, tid, ">>>>");
+            ShowDebugInfo(index, 1, tid, ">>>>");
             var tskCall = client.GetStringAsync(URL);
             var result = await tskCall;
-            tid = String.Format("{0:D2}", Thread.CurrentThread.ManagedThreadId);
-            ShowDebugInfoOld(index, 1, tid, "<<<<", result);
+            ShowDebugInfo(index, 1, tid, "<<<<", result);
         }
 
         private static async Task CallApi2Async(string URL, int i)
@@ -52,11 +52,10 @@ namespace D008.利用TAP工作建立大量並行工作練習
             // 取得當下的 ThreadId
             var tid = String.Format("{0:D2}", Thread.CurrentThread.ManagedThreadId);
 
-            ShowDebugInfoOld(index, 2, tid, ">>>>");
+            ShowDebugInfo(index, 2, tid, ">>>>");
             var tskCall = client.GetStringAsync(URL);
             var result = await tskCall;
-            tid = String.Format("{0:D2}", Thread.CurrentThread.ManagedThreadId);
-            ShowDebugInfoOld(index, 2, tid, "<<<<", result);
+            ShowDebugInfo(index, 2, tid, "<<<<", result);
         }
 
 
@@ -64,7 +63,7 @@ namespace D008.利用TAP工作建立大量並行工作練習
         private static bool IsCompleted = false;
         private static void WriteDebugInfo()
         {
-            while (!IsCompleted)
+            while (!IsCompleted || Infoes.Any())
             {
                 lock (__lockObj)
                 {
